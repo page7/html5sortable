@@ -22,7 +22,7 @@ $.fn.sortable = function(options) {
 			return;
 		}
 		var isHandle, index, items = $(this).children(options.items);
-		var placeholder = $('<' + (/^(ul|ol)$/i.test(this.tagName) ? 'li' : 'div') + ' class="sortable-placeholder">');
+		var placeholder = $('<' + items[0].tagName + ' class="sortable-placeholder" />');
 		items.find(options.handle).mousedown(function() {
 			isHandle = true;
 		}).mouseup(function() {
@@ -42,6 +42,7 @@ $.fn.sortable = function(options) {
 			dt.effectAllowed = 'move';
 			dt.setData('Text', 'dummy');
 			index = (dragging = $(this)).addClass('sortable-dragging').index();
+			dragging.css("position", "relative");
 		}).on('dragend.h5s', function() {
 			if (!dragging) {
 				return;
@@ -69,7 +70,10 @@ $.fn.sortable = function(options) {
 			e.originalEvent.dataTransfer.dropEffect = 'move';
 			if (items.is(this)) {
 				if (options.forcePlaceholderSize) {
-					placeholder.height(dragging.outerHeight());
+					placeholder.html(dragging.contents().filter(function(){
+						return this.nodeType == 1
+					}).clone().css('opacity', '0'))
+					.height(dragging.outerHeight());
 				}
 				dragging.hide();
 				$(this)[placeholder.index() < $(this).index() ? 'after' : 'before'](placeholder);
@@ -83,3 +87,4 @@ $.fn.sortable = function(options) {
 	});
 };
 })(jQuery);
+
